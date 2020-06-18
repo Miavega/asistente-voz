@@ -5,6 +5,9 @@ import wikipedia
 import smtplib
 import webbrowser as wb
 import os
+import pyautogui
+import psutil
+import pyjokes
 
 engine = pyttsx3.init()
 
@@ -12,6 +15,9 @@ voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[0].id)
 
 wikipedia.set_lang("es")
+
+#languages = ['en', 'de', 'es', 'gl', 'eu', 'it']
+language = 'es'
 
 def speak(audio):
     engine.say(audio)
@@ -78,6 +84,19 @@ def sendEmail(to, content):
     server.sendmail(from_addr='tucorreo', to_addrs=to, msg=content)
     server.close()
 
+def screenShot():
+    img = pyautogui.screenshot()
+    img.save("C://Users//mivegaal//Desktop//asistente-voz//ss.png")
+
+def cpu():
+    usage = str(psutil.cpu_percent())
+    speak("La CPU está en un porcentaje de uso de " + usage)
+    battery = psutil.sensors_battery()
+    speak("La bateria tiene un " + str(battery.percent) + " porciento de carga")
+
+def jokes():
+    speak(pyjokes.get_joke(language = 'es'))
+
 if __name__ == "__main__":
     wishme()
     while True:
@@ -118,5 +137,22 @@ if __name__ == "__main__":
             songs_dir = 'C:/Users/mivegaal/Downloads/musica'
             songs = os.listdir(songs_dir)
             os.startfile(os.path.join(songs_dir, songs[0]))
+        elif 'recuerda esto' in query:
+            speak("¿Qué desea recordar señor?")
+            data = takeCommand()
+            speak("Lo que debo guardar es: " + data)
+            remember = open('data.txt', 'w')
+            remember.write(data)
+            remember.close()
+        elif 'algo que deba recordar' in query:
+            remember = open('data.txt', 'r')
+            speak("Si señor, recuerda que " + remember.read())
+        elif 'captura de pantalla' in query:
+            screenShot()
+            speak("Captura realizada, señor!")
+        elif 'recursos del sistema' in query:
+            cpu()
+        elif 'broma' in query:
+            jokes()
         elif 'salir' in query:
             quit()
